@@ -9,7 +9,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cognizant</groupId>
-	<artifactId>resilience4j_demo</artifactId>
+	<artifactId>r4j_demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
