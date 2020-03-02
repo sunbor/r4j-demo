@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 
+import Placeholder;
+
 @RestController
 public class RetryController {
 	private static final String template = "Hello, %s!";
