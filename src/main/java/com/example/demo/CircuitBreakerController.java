@@ -43,19 +43,17 @@ public class CircuitBreakerController {
 		String inputLine = "this did not work";
 
 		try {
-			// Try<String> ded = Try.of(whatIsThis).map(someStr -> someStr);
-			// inputLine = ded.get();
-			logger.trace("inside circuit breaker");
+			//logger.trace("inside circuit breaker");
 			inputLine = cb.executeSupplier(throwingConsumerWrapper(() -> accessProducer()));
 		} catch (CallNotPermittedException e) {
 			logger.error("circuit breaker opened");
 			inputLine = "circuit breaker opened";
 			// e.printStackTrace();
 		} catch (ConnectException e) {
-			logger.trace("inside catch for connection exception");
+			logger.trace("connect exception occurred inside circuitBreaker");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.error("jhklwfajhklwajhkwrgeajhklwrgeahuilwrgejhklwgea");
+			logger.error("io exception occurred inside circuitBreaker");
 			// e.printStackTrace();
 		} catch (RuntimeException e) {
 			logger.error("exception occurred while trying to connect");
