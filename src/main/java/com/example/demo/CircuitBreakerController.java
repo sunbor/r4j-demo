@@ -40,8 +40,6 @@ public class CircuitBreakerController {
 
 		cb.getEventPublisher().onStateTransition(event -> logger.info("circuit breaker flipped"));
 
-		// logger.info("hello this is log4j");
-
 		String inputLine = "this did not work";
 
 		try {
@@ -61,7 +59,7 @@ public class CircuitBreakerController {
 			// e.printStackTrace();
 		} catch (RuntimeException e) {
 			logger.error("exception occurred while trying to connect");
-			inputLine = "failed to connect.\n" + "HiEveryone application is down";
+			inputLine = "failed to connect.\n" + "producer application is down";
 		}
 
 		logger.trace("inputLine: " + inputLine);
@@ -109,7 +107,7 @@ public class CircuitBreakerController {
 			throws ConnectException, IOException {
 
 		return () -> {
-			String inputLine = "dumb throwing function did not work";
+			String inputLine = "throwing function did not work";
 			try {
 				inputLine = (String) throwingConsumer.accept();
 			} catch (ConnectException ex) {
