@@ -112,7 +112,7 @@ public class CircuitBreakerController {
 	private String accessProducerFallback() {
 		String inputLine = "accessProducer did not work";
 		try {
-			URL url = new URL("http://localhost:8082/bh");
+			URL url = new URL("http://localhost:8083/bh");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 
