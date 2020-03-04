@@ -69,7 +69,7 @@ public class CircuitBreakerController {
 
 		String inputLine = "accessProducer did not work";
 		try {
-			URL url = new URL("http://localhost:8081/test");
+			URL url = new URL("http://localhost:8082/rl");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 
