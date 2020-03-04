@@ -101,6 +101,7 @@ public class CircuitBreakerController {
 		}
 		catch (ConnectException e) {
 			logger.error("failed to connect to producer");
+			inputLine = accessProducerFallback();
 			throw e;
 			// e.printStackTrace();
 		} catch (IOException e) {
@@ -109,6 +110,38 @@ public class CircuitBreakerController {
 		}
 
 		logger.trace("producer output: " + inputLine);
+		return inputLine;
+	}
+	
+	private String accessProducerFallback() {
+		String inputLine = "accessProducer did not work";
+		try {
+			URL url = new URL("http://localhost:8083/bh");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			inputLine = content.toString();
+			in.close();
+
+		} catch (MalformedURLException e) {
+			logger.error("url format error while trying to connect to fallback");
+			e.printStackTrace();
+		}
+		catch (ConnectException e) {
+			logger.error("failed to connect to fallback");
+			// e.printStackTrace();
+		} catch (IOException e) {
+			logger.error("ioexception while trying to connect to fallback");
+			e.printStackTrace();
+		}
+
+		logger.trace("fallback output: " + inputLine);
 		return inputLine;
 	}
 	
