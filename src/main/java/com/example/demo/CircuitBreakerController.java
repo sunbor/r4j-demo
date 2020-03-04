@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +24,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.CheckedFunction0;
 
 @RestController
+@Service
 public class CircuitBreakerController {
 
 	Logger logger = Logger.getLogger(CircuitBreakerController.class);
@@ -35,6 +37,13 @@ public class CircuitBreakerController {
 	CircuitBreaker cb = cbr.circuitBreaker("breakMe");
 	CheckedFunction0<String> whatIsThis = CircuitBreaker.decorateCheckedSupplier(cb, () -> accessProducer());
 
+//	private final CircuitBreakerPropConfig config2;
+//	
+//	@Autowired
+//	public CircuitBreakerController(CircuitBreakerPropConfig config2) {
+//		this.config2 = config2;
+//	}
+	
 	@RequestMapping("/circuit_breaker")
 	public String circuitBreaker() {
 
@@ -56,10 +65,12 @@ public class CircuitBreakerController {
 			logger.error("io exception occurred inside circuitBreaker");
 			// e.printStackTrace();
 		} catch (RuntimeException e) {
-			logger.error("exception occurred while trying to connect");
-			inputLine = "failed to connect.\n" + "producer application is down";
+			logger.error("exception occurred while trying to connect. redirecting to fallback");
+			inputLine = accessProducerFallback();
 		}
-
+		
+		//logger.trace("configuration value: " + config2.getTest());
+		
 		logger.trace("inputLine: " + inputLine);
 		return inputLine;
 	}
@@ -68,8 +79,7 @@ public class CircuitBreakerController {
 	private String accessProducer() throws ConnectException {
 
 		String inputLine = "accessProducer did not work";
-		try {
-			URL url = new URL("http://localhost:8082/test");
+		try {URL url = new URL("http://localhost:8082/test");
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("GET");
 
@@ -96,6 +106,38 @@ public class CircuitBreakerController {
 		}
 
 		logger.trace("producer output: " + inputLine);
+		return inputLine;
+	}
+	
+	private String accessProducerFallback() {
+		String inputLine = "accessProducer did not work";
+		try {
+			URL url = new URL("http://localhost:8083/bh");
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+				content.append(inputLine);
+			}
+			inputLine = content.toString();
+			in.close();
+
+		} catch (MalformedURLException e) {
+			logger.error("url format error while trying to connect to fallback");
+			e.printStackTrace();
+		}
+		catch (ConnectException e) {
+			logger.error("failed to connect to fallback");
+			// e.printStackTrace();
+		} catch (IOException e) {
+			logger.error("ioexception while trying to connect to fallback");
+			e.printStackTrace();
+		}
+
+		logger.trace("fallback output: " + inputLine);
 		return inputLine;
 	}
 	

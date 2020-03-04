@@ -27,6 +27,7 @@ public class RetryController {
 	@GetMapping("/demo")
 	public Message retry(@RequestParam(value = "name", defaultValue = "World") String name) {
 		help();
+		str = "consumer side results: ";
 		
 		CircuitBreakerController cbc = new CircuitBreakerController();
 		Runnable runnable = () -> cbc.circuitBreaker();
