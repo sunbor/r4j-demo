@@ -67,8 +67,8 @@ public class CircuitBreakerController {
 			logger.error("io exception occurred inside circuitBreaker");
 			// e.printStackTrace();
 		} catch (RuntimeException e) {
-			logger.error("exception occurred while trying to connect");
-			inputLine = "failed to connect.\n" + "producer application is down";
+			logger.error("exception occurred while trying to connect. redirecting to fallback");
+			inputLine = accessProducerFallback();
 		}
 		
 		//logger.trace("configuration value: " + config2.getTest());
@@ -101,7 +101,6 @@ public class CircuitBreakerController {
 		}
 		catch (ConnectException e) {
 			logger.error("failed to connect to producer");
-			inputLine = accessProducerFallback();
 			throw e;
 			// e.printStackTrace();
 		} catch (IOException e) {
