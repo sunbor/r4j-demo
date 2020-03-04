@@ -11,9 +11,12 @@ import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.utility.CircuitBreakerPropConfig;
 import com.example.utility.ThrowingConsumer;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -23,6 +26,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.vavr.CheckedFunction0;
 
 @RestController
+@Service
 public class CircuitBreakerController {
 
 	Logger logger = Logger.getLogger(CircuitBreakerController.class);
@@ -35,6 +39,13 @@ public class CircuitBreakerController {
 	CircuitBreaker cb = cbr.circuitBreaker("breakMe");
 	CheckedFunction0<String> whatIsThis = CircuitBreaker.decorateCheckedSupplier(cb, () -> accessProducer());
 
+//	private final CircuitBreakerPropConfig config2;
+//	
+//	@Autowired
+//	public CircuitBreakerController(CircuitBreakerPropConfig config2) {
+//		this.config2 = config2;
+//	}
+	
 	@RequestMapping("/circuit_breaker")
 	public String circuitBreaker() {
 
@@ -59,7 +70,9 @@ public class CircuitBreakerController {
 			logger.error("exception occurred while trying to connect");
 			inputLine = "failed to connect.\n" + "producer application is down";
 		}
-
+		
+		//logger.trace("configuration value: " + config2.getTest());
+		
 		logger.trace("inputLine: " + inputLine);
 		return inputLine;
 	}
